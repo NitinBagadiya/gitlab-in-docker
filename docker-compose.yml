@@ -1,0 +1,31 @@
+---
+version: "3.6"
+services:
+  gitlab:
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        #external_url 'https://gitlab.faltu.com:8080'
+        gitlab_rails['gitlab_shell_ssh_port'] = 8022
+        # Add any other gitlab.rb configuration here, each on its own line
+    #hostname: gitlab.faltu.com
+    image: "gitlab/gitlab-ce:14.9.0-ce.0"
+    ports:
+      - "8080:80"
+      - "8443:443"
+      - "8022:22"
+    restart: always
+    shm_size: 256m
+    volumes:
+      - "$GITLAB_HOME/config:/etc/gitlab"
+      - "$GITLAB_HOME/logs:/var/log/gitlab"
+      - "$GITLAB_HOME/data:/var/opt/gitlab"
+
+  gitlabrunner:
+    depends_on:
+      - gitlab
+    image: 'gitlab/gitlab-runner:v14.9.1'
+    ports:
+      - "9022:22"
+    volumes:
+      - "$GITLAB_RUNNER/config:/etc/gitlabrunner"
+
